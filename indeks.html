@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Teka-Teki Tersulit Indonesia</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #0f0;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 { color: #00ff99; }
+
+    #tekaTeki {
+      margin: 20px;
+      font-size: 18px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 5px;
+      border: none;
+      font-size: 16px;
+    }
+    button {
+      background-color: #00ff99;
+      cursor: pointer;
+    }
+    #timer {
+      font-size: 20px;
+      color: #ff4444;
+    }
+
+    .shake {
+      animation: shake 0.4s;
+    }
+    @keyframes shake {
+      0% { transform: translate(1px, 1px) rotate(0deg); }
+      20% { transform: translate(-1px, 2px) rotate(-1deg); }
+      40% { transform: translate(-3px, 1px) rotate(1deg); }
+      60% { transform: translate(3px, 2px) rotate(0deg); }
+      80% { transform: translate(1px, -1px) rotate(1deg); }
+      100% { transform: translate(-1px, 2px) rotate(-1deg); }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      h1 {
+        font-size: 20px;
+      }
+      #tekaTeki {
+        font-size: 16px;
+      }
+      input, button {
+        width: 90%;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Teka-Teki Tersulit Indonesia 🇮🇩</h1>
+<p id="level">Level: 1</p>
+<p id="tekaTeki"></p>
+
+<input type="text" id="jawaban" placeholder="Jawaban...">
+<button onclick="cekJawaban()">Cek Jawaban</button>
+
+<p id="hasil"></p>
+<p>Skor: <span id="skor">0</span></p>
+<p id="timer">Timer: 30</p>
+
+<!-- Suara via online link (no file lokal) -->
+<audio id="benarSound" src="https://cdn.pixabay.com/download/audio/2022/10/31/audio_4c99f18134.mp3"></audio>
+<audio id="salahSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_7fd0f3a4b0.mp3"></audio>
+<audio id="timeoutSound" src="https://cdn.pixabay.com/download/audio/2022/10/31/audio_4c99f18134.mp3"></audio>
+
+<script>
+const tekaTekis = [
+  { soal: "Aku benda yang makin penuh makin ringan. Apakah aku?", jawaban: "balon" },
+  { soal: "Semakin diambil semakin besar. Apakah aku?", jawaban: "lubang" },
+  { soal: "Aku ada di awal malam, di akhir pagi, tapi tak pernah tampak di siang hari. Siapakah aku?", jawaban: "huruf m" },
+  { soal: "Aku lahir dari api, tapi aku bukan api. Aku terang di malam hari, tapi aku bukan matahari. Apakah aku?", jawaban: "bintang" },
+  { soal: "Kota apa di Indonesia yang tidak punya huruf 'a' di namanya?", jawaban: "kupang" }
+];
+
+let index = 0;
+let skor = 0;
+let waktu = 30;
+let timer = setInterval(hitungMundur, 1000);
+
+const benarSound = document.getElementById('benarSound');
+const salahSound = document.getElementById('salahSound');
+const timeoutSound = document.getElementById('timeoutSound');
+
+document.getElementById('tekaTeki').innerText = tekaTekis[index].soal;
+
+function hitungMundur() {
+  waktu--;
+  document.getElementById('timer').innerText = "Timer: " + waktu;
+  if(waktu === 0){
+    clearInterval(timer);
+    document.getElementById('hasil').innerText = "⏰ Waktu habis! Game Over!";
+    timeoutSound.play();
+    disableInput();
+  }
+}
+
+function cekJawaban() {
+  let userJawab = document.getElementById('jawaban').value.toLowerCase();
+  if(userJawab === tekaTekis[index].jawaban){
+    skor += 10;
+    document.getElementById('skor').innerText = skor;
+    document.getElementById('hasil').innerText = "✅ Benar! Lanjut Level!";
+    benarSound.play();
+    index++;
+    if(index < tekaTekis.length){
+      document.getElementById('tekaTeki').innerText = tekaTekis[index].soal;
+      document.getElementById('level').innerText = "Level: " + (index + 1);
+      waktu = 30;
+    } else {
+      document.getElementById('tekaTeki').innerText = "🎉 Selamat! Semua teka-teki berhasil kamu pecahkan!";
+      clearInterval(timer);
+      disableInput();
+    }
+  } else {
+    document.getElementById('hasil').innerText = "❌ Salah! Coba lagi!";
+    salahSound.play();
+    shakeElement(document.body);
+  }
+}
+
+function disableInput() {
+  document.getElementById('jawaban').disabled = true;
+}
+
+function shakeElement(element){
+  element.classList.add('shake');
+  setTimeout(() => element.classList.remove('shake'), 500);
+}
+</script>
+
+</body>
+</html>
